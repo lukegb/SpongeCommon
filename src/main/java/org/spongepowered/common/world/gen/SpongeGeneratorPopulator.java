@@ -25,6 +25,7 @@
 package org.spongepowered.common.world.gen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.flowpowered.math.GenericMath;
 
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3i;
