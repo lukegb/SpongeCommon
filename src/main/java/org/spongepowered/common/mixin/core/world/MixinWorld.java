@@ -24,12 +24,6 @@
  */
 package org.spongepowered.common.mixin.core.world;
 
-import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
-
-import org.spongepowered.common.world.gen.CustomChunkProviderGenerate;
-import org.spongepowered.common.world.gen.SpongeGeneratorPopulator;
-import org.spongepowered.common.world.gen.SpongeBiomeGenerator;
-import org.spongepowered.common.world.gen.CustomWorldChunkManager;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -131,8 +125,8 @@ import org.spongepowered.common.interfaces.IMixinWorldSettings;
 import org.spongepowered.common.interfaces.IMixinWorldType;
 import org.spongepowered.common.interfaces.block.IMixinBlock;
 import org.spongepowered.common.registry.SpongeGameRegistry;
+import org.spongepowered.common.interfaces.gen.IPopulatorOwner;
 import org.spongepowered.common.scoreboard.SpongeScoreboard;
-import org.spongepowered.common.interfaces.IPopulatorOwner;
 import org.spongepowered.common.util.SpongeHooks;
 import org.spongepowered.common.util.VecHelper;
 import org.spongepowered.common.world.DimensionManager;
@@ -778,7 +772,7 @@ public abstract class MixinWorld implements World, IMixinWorld {
     public boolean containsBlock(int x, int y, int z) {
         return VecHelper.inBounds(x, y, z, BLOCK_MIN, BLOCK_MAX);
     }
-
+    
     private void checkBiomeBounds(int x, int z) {
         if (!containsBiome(x, z)) {
             throw new PositionOutOfBoundsException(new Vector2i(x, z), BIOME_MIN, BIOME_MAX);
