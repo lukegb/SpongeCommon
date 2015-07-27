@@ -27,13 +27,19 @@ package org.spongepowered.common.mixin.core.world;
 import static org.spongepowered.common.data.DataTransactionBuilder.builder;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLever;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -43,9 +49,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManipulator;
 import org.spongepowered.api.data.DataPriority;
 import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.block.BlockRedstoneUpdateEvent;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
@@ -57,8 +66,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import org.spongepowered.common.Sponge;
@@ -104,6 +111,9 @@ public abstract class MixinChunk implements Chunk {
 
     @Shadow
     public abstract void setBiomeArray(byte[] biomeArray);
+
+    @Shadow
+    public abstract ClassInheritanceMultiMap[] getEntityLists();
 
     @Inject(method = "<init>(Lnet/minecraft/world/World;II)V", at = @At("RETURN"), remap = false)
     public void onConstructed(World world, int x, int z, CallbackInfo ci) {
@@ -300,6 +310,42 @@ public abstract class MixinChunk implements Chunk {
     public float getTemperature(int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
         return getBiome(pos, this.worldObj.getWorldChunkManager()).getFloatTemperature(pos);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Collection<Entity> getEntities() {
+        return ImmutableSet.copyOf(Iterables.<Entity>concat(getEntityLists()));
+    }
+
+    @Override
+    public Collection<Entity> getEntities(Predicate<Entity> filter) {
+        return Collections2.filter(getEntities(), filter);
+    }
+
+    @Override
+    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
+        return getWorld().createEntity(type, position);
+    }
+
+    @Override
+    public Optional<Entity> createEntity(EntityType type, Vector3i position) {
+        return getWorld().createEntity(type, position);
+    }
+
+    @Override
+    public Optional<Entity> createEntity(DataContainer entityContainer) {
+        return getWorld().createEntity(entityContainer);
+    }
+
+    @Override
+    public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
+        return getWorld().createEntity(entityContainer, position);
+    }
+
+    @Override
+    public boolean spawnEntity(Entity entity) {
+        return getWorld().spawnEntity(entity);
     }
 
     @Inject(method = "setBlockState", at = @At(value = "INVOKE_ASSIGN", target = "net.minecraft.world.chunk.Chunk.getBlockState"
