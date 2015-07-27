@@ -41,6 +41,7 @@
         "data.MixinDataHolder",
         "data.holders.MixinBlockButton",
         "data.holders.MixinBlockLever",
+        "data.holders.MixinBlockPressurePlate",
         "data.holders.MixinBlockStandingSign",
         "data.holders.MixinBlockWallSign",
         "data.types.MixinEnumArt",
