@@ -25,6 +25,7 @@
 package org.spongepowered.common;
 
 import com.google.common.base.Predicate;
+import org.spongepowered.api.service.error.ErrorReportService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.common.command.SpongeHelpCommand;
 
@@ -53,6 +54,7 @@ import org.spongepowered.common.command.CommandSponge;
 import org.spongepowered.common.command.SpongeCommandDisambiguator;
 import org.spongepowered.common.registry.SpongeGameRegistry;
 import org.spongepowered.common.service.config.SpongeConfigService;
+import org.spongepowered.common.service.error.SpongeErrorReportService;
 import org.spongepowered.common.service.pagination.SpongePaginationService;
 import org.spongepowered.common.service.persistence.SpongeSerializationService;
 import org.spongepowered.common.service.profile.SpongeProfileResolver;
@@ -76,6 +78,7 @@ public final class SpongeBootstrap {
     private static final org.slf4j.Logger slf4jLogger = new SLF4JLogger((AbstractLogger) Sponge.getLogger(), Sponge.getLogger().getName());
 
     public static void initializeServices() {
+        registerService(ErrorReportService.class, SpongeErrorReportService.INSTANCE);
         SimpleCommandService commandService = new SimpleCommandService(Sponge.getGame(), slf4jLogger,
                 new SpongeCommandDisambiguator(Sponge.getGame()));
         if (registerService(CommandService.class, commandService)) {

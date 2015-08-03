@@ -26,12 +26,15 @@ package org.spongepowered.common.mixin.core.server;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.Futures;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.crash.CrashReport;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ReportedException;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldManager;
 import net.minecraft.world.WorldProvider;
@@ -48,6 +51,8 @@ import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.service.error.ErrorReport;
+import org.spongepowered.api.service.error.UserErrorException;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -65,6 +70,8 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.Sponge;
 import org.spongepowered.common.event.SpongeImplEventFactory;
 import org.spongepowered.common.interfaces.IMixinCommandSender;
@@ -73,6 +80,7 @@ import org.spongepowered.common.interfaces.IMixinMinecraftServer;
 import org.spongepowered.common.interfaces.IMixinSubject;
 import org.spongepowered.common.interfaces.IMixinWorldInfo;
 import org.spongepowered.common.interfaces.IMixinWorldProvider;
+import org.spongepowered.common.service.error.FatalUrlPrintingCallback;
 import org.spongepowered.common.text.sink.SpongeMessageSinkFactory;
 import org.spongepowered.common.world.DimensionManager;
 import org.spongepowered.common.world.SpongeDimensionType;
@@ -117,6 +125,7 @@ public abstract class MixinMinecraftServer implements Server, ConsoleSource, IMi
     @Shadow public abstract void setDifficultyForAllWorlds(EnumDifficulty difficulty);
     @Shadow protected abstract void convertMapIfNeeded(String worldNameIn);
     @Shadow protected abstract void setResourcePackFromWorld(String worldNameIn, ISaveHandler saveHandlerIn);
+    @Shadow public abstract CrashReport addServerInfoToCrashReport(CrashReport report);
 
     @Shadow
     @SideOnly(Side.SERVER)
@@ -571,5 +580,29 @@ public abstract class MixinMinecraftServer implements Server, ConsoleSource, IMi
             ret = DimensionManager.getWorldFromDimId(dim);
         }
         return ret;
+    }
+
+    @Redirect(method = "run", at = @At(value = "INVOKE", target = "org.apache.logging.log4j.Logger.error(Ljava/lang/String;Ljava/lang/Throwable;)V"))
+    public void redirectLogCrashReportStacktrace(Logger logger, String message, Throwable exception) {
+        if ((exception instanceof ReportedException && ((ErrorReport) ((ReportedException) exception).getCrashReport()).isUserError())
+                || exception instanceof UserErrorException) {
+            // This is a most likely a configuration exception
+            logger.error("An error has occurred while running the server. This error is MOST LIKELY DUE TO A MISCONFIGURATION. Please check the "
+                    + "error report for possible actions to take before filing a bug report with any appropriate developers");
+        } else {
+            logger.error(message, exception);
+        }
+    }
+
+    @Redirect(method = "run", at = @At(value = "INVOKE", target = "net.minecraft.crash.CrashReport.saveToFile(Ljava/io/File;)Z"))
+    public boolean redirectSaveCrashReportToFile(CrashReport report, File fileToSave) {
+        ErrorReport spongeReport = (ErrorReport) report;
+        Futures.addCallback(spongeReport.toPastebin(), new FatalUrlPrintingCallback());
+        return report.saveToFile(fileToSave);
+    }
+
+    @Override
+    public void decorateErrorReport(ErrorReport report) {
+        addServerInfoToCrashReport((CrashReport) report);
     }
 }

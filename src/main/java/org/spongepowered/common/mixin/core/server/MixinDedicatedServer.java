@@ -29,9 +29,12 @@ import net.minecraft.server.dedicated.DedicatedServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.io.File;
 import java.net.Proxy;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(DedicatedServer.class)
 public abstract class MixinDedicatedServer extends MinecraftServer {
@@ -53,6 +56,24 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
     public void setGuiEnabled() {
         //MinecraftServerGui.createServerGui(this);
         this.guiIsEnabled = false;
+    }
+
+
+    /**
+     * @author zml
+     *
+     * This injection properly sets the server stopped flag after a server crash, allowing the server to shut down fully without extra effort.
+     */
+    @Redirect(method = "finalTick", at = @At(value = "INVOKE", target = "net.minecraft.server.MinecraftServer.isServerRunning()Z"))
+    public boolean stopServerOnCrash(MinecraftServer server) {
+        initiateShutdown();
+        return false;
+        /*if (this.finalTickFlag.compareAndSet(false, true)) {
+            initiateShutdown();
+            return true;
+        } else {
+            return false;
+        }*/
     }
 
 }
