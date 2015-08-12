@@ -432,7 +432,7 @@ public abstract class SpongeGameRegistry implements GameRegistry {
     private final Map<String, SelectorType> selectorMappings = Maps.newHashMap();
 
     private final Map<String, NotePitch> notePitchMappings = Maps.newHashMap();
-    private final Map<String, SkullType> skullTypeMappings = Maps.newHashMap();
+    public final Map<String, SkullType> skullTypeMappings = Maps.newLinkedHashMap();
     private final Map<String, TreeType> treeTypeMappings = Maps.newHashMap();
     private final Map<String, BannerPatternShape> bannerPatternShapeMappings = Maps.newHashMap();
     public final Map<String, BannerPatternShape> idToBannerPatternShapeMappings = Maps.newHashMap();
