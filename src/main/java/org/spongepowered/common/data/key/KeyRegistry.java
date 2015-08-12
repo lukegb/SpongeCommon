@@ -31,6 +31,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Career;
+import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -55,6 +56,7 @@ public class KeyRegistry {
         keyMap.put("shows_display_name", makeKey(Boolean.class, Value.class, of("ShowDisplayName")));
         keyMap.put("display_name", makeKey(Text.class, Value.class, of("DisplayName")));
         keyMap.put("career", makeKey(Career.class, Value.class, of("Career")));
+        keyMap.put("skull_type", makeKey(SkullType.class, Value.class, of("SkullType")));
         RegistryHelper.mapFields(Keys.class, keyMap);
     }
 

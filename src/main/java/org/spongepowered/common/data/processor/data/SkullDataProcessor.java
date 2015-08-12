@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntitySkull;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.DataTransactionBuilder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
@@ -15,11 +16,16 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableSkullData;
 import org.spongepowered.api.data.manipulator.mutable.SkullData;
 import org.spongepowered.api.data.merge.MergeFunction;
+import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.common.data.DataProcessor;
+import org.spongepowered.common.data.manipulator.immutable.ImmutableSpongeSkullData;
 import org.spongepowered.common.data.manipulator.mutable.SpongeSkullData;
 import org.spongepowered.common.data.processor.common.SkullUtils;
+import org.spongepowered.common.data.type.SpongeSkullType;
+import org.spongepowered.common.data.util.DataUtil;
+import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 
 public class SkullDataProcessor implements DataProcessor<SkullData, ImmutableSkullData> {
 
@@ -67,7 +73,7 @@ public class SkullDataProcessor implements DataProcessor<SkullData, ImmutableSku
 
     @Override
     public Optional<ImmutableSkullData> fillImmutable(DataHolder dataHolder, ImmutableSkullData immutable) {
-        return
+        return null;
     }
 
     @Override
@@ -80,34 +86,68 @@ public class SkullDataProcessor implements DataProcessor<SkullData, ImmutableSku
         return null;
     }
 
+    private DataTransactionResult setImpl(DataHolder dataHolder, SkullData manipulator, SpongeSkullType newType) {
+        if (!this.supports(dataHolder)) {
+            return DataTransactionBuilder.failResult(manipulator.getValues());
+        }
+
+        DataTransactionBuilder builder = DataTransactionBuilder.builder();
+
+        SpongeSkullType oldType = null;
+
+        if (dataHolder instanceof TileEntitySkull) {
+            TileEntitySkull teSkull = (TileEntitySkull) dataHolder;
+
+            oldType = (SpongeSkullType) SkullUtils.getSkullType(teSkull);
+            SkullUtils.setSkullType(teSkull, newType.getByteId());
+        } else if (SkullUtils.isValidItemStack(dataHolder)) {
+            ItemStack itemStack = (ItemStack) dataHolder;
+
+            oldType = (SpongeSkullType) SkullUtils.getSkullType(itemStack);
+            itemStack.setItemDamage(newType.getByteId());
+        }
+
+        builder.replace(new ImmutableSpongeValue<SkullType>(Keys.SKULL_TYPE, oldType));
+        builder.success(new ImmutableSpongeValue<SkullType>(Keys.SKULL_TYPE, newType));
+
+        return builder.build();
+    }
+
     @Override
     public DataTransactionResult set(DataHolder dataHolder, SkullData manipulator) {
-        return null;
+        return this.setImpl(dataHolder, manipulator, (SpongeSkullType) manipulator.type().get());
     }
 
     @Override
     public DataTransactionResult set(DataHolder dataHolder, SkullData manipulator, MergeFunction function) {
-        return null;
+        // Avoid calling the merge function and this.from() if the holder is not supported
+        if (this.supports(dataHolder)) {
+            return this.setImpl(dataHolder, manipulator, (SpongeSkullType) function.merge(this.from(dataHolder).get(), manipulator).type().get());
+        }
+        return DataTransactionBuilder.failResult(manipulator.getValues());
     }
 
     @Override
     public Optional<ImmutableSkullData> with(Key<? extends BaseValue<?>> key, Object value, ImmutableSkullData immutable) {
-        return null;
+        if (key.equals(Keys.SKULL_TYPE)) {
+            return Optional.<ImmutableSkullData>of(new ImmutableSpongeSkullData((SkullType) value));
+        }
+        return Optional.absent();
     }
 
     @Override
     public DataTransactionResult remove(DataHolder dataHolder) {
-        return null;
+        return DataTransactionBuilder.builder().result(DataTransactionResult.Type.FAILURE).build();
     }
 
     @Override
     public SkullData create() {
-        return null;
+        return new SpongeSkullData(SkullUtils.DEFAULT_TYPE);
     }
 
     @Override
     public ImmutableSkullData createImmutable() {
-        return null;
+        return new ImmutableSpongeSkullData(SkullUtils.DEFAULT_TYPE);
     }
 
     @Override
@@ -117,6 +157,9 @@ public class SkullDataProcessor implements DataProcessor<SkullData, ImmutableSku
 
     @Override
     public Optional<SkullData> build(DataView container) throws InvalidDataException {
-        return null;
+        if (container.contains(Keys.SKULL_TYPE.getQuery())) {
+            return Optional.<SkullData>of(new SpongeSkullData(DataUtil.getData(container, Keys.SKULL_TYPE)));
+        }
+        return Optional.absent();
     }
 }

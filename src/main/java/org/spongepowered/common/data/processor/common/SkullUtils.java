@@ -33,6 +33,12 @@ public class SkullUtils {
         return SkullUtils.getSkullType(((TileEntitySkull) tileEntitySkull).getSkullType());
     }
 
+    public static void setSkullType(TileEntitySkull tileEntitySkull, int skullType) {
+        tileEntitySkull.setType(skullType);
+        tileEntitySkull.markDirty();
+        tileEntitySkull.getWorld().markBlockForUpdate(tileEntitySkull.getPos());
+    }
+
     public static SkullType getSkullType(ItemStack itemStack) {
         return SkullUtils.getSkullType(((ItemStack) itemStack).getMetadata());
     }

@@ -78,7 +78,7 @@ public class SkullValueProcessor implements ValueProcessor<SkullType, Value<Skul
 
         if (container instanceof TileEntitySkull) {
             oldValue = getApiValueFromContainer(container).get().asImmutable();
-            ((TileEntitySkull) container).setType(skullType);
+            SkullUtils.setSkullType((TileEntitySkull) container, skullType);
         } else if (SkullUtils.isValidItemStack(container)) {
             oldValue = getApiValueFromContainer(container).get().asImmutable();
             ((ItemStack) container).setItemDamage(skullType);
