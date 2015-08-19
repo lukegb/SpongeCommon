@@ -116,8 +116,8 @@ public class SignLinesValueProcessor implements ValueProcessor<List<Text>, ListV
 
     @SuppressWarnings("unchecked")
     @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
-        return offerToStore(container, ((List<Text>) value.get()));
+    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<List<Text>> value) {
+        return offerToStore(container, value.get());
     }
 
     @Override

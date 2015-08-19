@@ -34,13 +34,14 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.common.data.AbstractValueProcessor;
 import org.spongepowered.common.data.ValueProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 import org.spongepowered.common.interfaces.IMixinEntity;
 
 @SuppressWarnings("ConstantConditions")
-public class EyeHeightValueProcessor implements ValueProcessor<Double, Value<Double>> {
+public class EyeHeightValueProcessor extends AbstractValueProcessor<Double> {
 
     @Override
     public Key<? extends BaseValue<Double>> getKey() {
@@ -59,37 +60,6 @@ public class EyeHeightValueProcessor implements ValueProcessor<Double, Value<Dou
             return Optional.of((double) entity.getEyeHeight());
         }
         return Optional.absent();
-    }
-
-    @Override
-    public Optional<Value<Double>> getApiValueFromContainer(ValueContainer<?> container) {
-        if (supports(container)) {
-            final Entity entity = (Entity) container;
-            return Optional.<Value<Double>>of(new SpongeValue<Double>(Keys.EYE_HEIGHT, 0d, (double) entity.getEyeHeight()));
-        }
-        return Optional.absent();
-    }
-
-    @Override
-    public DataTransactionResult transform(ValueContainer<?> container, Function<Double, Double> function) {
-        if (supports(container)) {
-            final Entity entity = (Entity) container;
-            final Double oldValue = (double) entity.getEyeHeight();
-            final Double newValue = function.apply(oldValue);
-            ((IMixinEntity) entity).setEyeHeight(newValue);
-            return DataTransactionBuilder.successReplaceResult(new ImmutableSpongeValue<Double>(Keys.EYE_HEIGHT, newValue),
-                new ImmutableSpongeValue<Double>(Keys.EYE_HEIGHT, oldValue));
-        }
-        return DataTransactionBuilder.failNoData();
-    }
-
-    @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
-        final Object object = value.get();
-        if (object instanceof Number) {
-            return offerToStore(container, ((Number) object).doubleValue());
-        }
-        return DataTransactionBuilder.failNoData();
     }
 
     @Override

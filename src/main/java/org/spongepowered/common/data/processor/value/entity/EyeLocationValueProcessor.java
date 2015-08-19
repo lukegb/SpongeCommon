@@ -35,13 +35,14 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.common.data.AbstractValueProcessor;
 import org.spongepowered.common.data.ValueProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 import org.spongepowered.common.interfaces.IMixinEntity;
 
 @SuppressWarnings("ConstantConditions")
-public class EyeLocationValueProcessor implements ValueProcessor<Vector3d, Value<Vector3d>> {
+public class EyeLocationValueProcessor extends AbstractValueProcessor<Vector3d> {
 
     @Override
     public Key<? extends BaseValue<Vector3d>> getKey() {
@@ -60,38 +61,6 @@ public class EyeLocationValueProcessor implements ValueProcessor<Vector3d, Value
             return Optional.of(new Vector3d(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ));
         }
         return Optional.absent();
-    }
-
-    @Override
-    public Optional<Value<Vector3d>> getApiValueFromContainer(ValueContainer<?> container) {
-        if (supports(container)) {
-            final Entity entity = (Entity) container;
-            return Optional.<Value<Vector3d>>of(new SpongeValue<Vector3d>(Keys.EYE_LOCATION, new Vector3d(entity.posX, entity.posY, entity.posZ),
-                new Vector3d(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ)));
-        }
-        return Optional.absent();
-    }
-
-    @Override
-    public DataTransactionResult transform(ValueContainer<?> container, Function<Vector3d, Vector3d> function) {
-        if (supports(container)) {
-            final Entity entity = (Entity) container;
-            final Vector3d oldValue = new Vector3d(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
-            final Vector3d newValue = function.apply(oldValue);
-            ((IMixinEntity) entity).setEyeHeight(newValue.getY() - oldValue.getY());
-            return DataTransactionBuilder.successReplaceResult(new ImmutableSpongeValue<Vector3d>(Keys.EYE_LOCATION, newValue),
-                new ImmutableSpongeValue<Vector3d>(Keys.EYE_LOCATION, oldValue));
-        }
-        return DataTransactionBuilder.failNoData();
-    }
-
-    @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
-        final Object object = value.get();
-        if (object instanceof Vector3d) {
-            return offerToStore(container, (Vector3d) object);
-        }
-        return DataTransactionBuilder.failNoData();
     }
 
     @Override

@@ -91,12 +91,8 @@ public class FoodSaturationValueProcessor implements ValueProcessor<Double, Muta
     }
 
     @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
-        final Object object = value.get();
-        if (object instanceof Number) {
-            return offerToStore(container, ((Number) object).doubleValue());
-        }
-        return DataTransactionBuilder.failNoData();
+    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<Double> value) {
+        return offerToStore(container, value.get());
     }
 
     @Override

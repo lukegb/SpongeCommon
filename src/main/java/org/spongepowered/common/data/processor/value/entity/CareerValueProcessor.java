@@ -38,13 +38,14 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.common.data.AbstractValueProcessor;
 import org.spongepowered.common.data.ImmutableDataCachingUtil;
 import org.spongepowered.common.data.ValueProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 import org.spongepowered.common.interfaces.entity.IMixinVillager;
 
-public class CareerValueProcessor implements ValueProcessor<Career, Value<Career>> {
+public class CareerValueProcessor extends AbstractValueProcessor<Career> {
 
     @Override
     public Key<? extends BaseValue<Career>> getKey() {
@@ -54,14 +55,6 @@ public class CareerValueProcessor implements ValueProcessor<Career, Value<Career
     @Override
     public Optional<Career> getValueFromContainer(ValueContainer<?> container) {
         return container instanceof IMixinVillager ? Optional.of(((IMixinVillager) container).getCareer()) : Optional.<Career>absent();
-    }
-
-    @Override
-    public Optional<Value<Career>> getApiValueFromContainer(ValueContainer<?> container) {
-        if (container instanceof IMixinVillager) {
-            return Optional.<Value<Career>>of(new SpongeValue<Career>(Keys.CAREER, ((IMixinVillager) container).getCareer()));
-        }
-        return Optional.absent();
     }
 
     @Override
@@ -84,11 +77,6 @@ public class CareerValueProcessor implements ValueProcessor<Career, Value<Career
             }
         }
         return DataTransactionBuilder.failNoData();
-    }
-
-    @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
-        return offerToStore(container, ((Career) value.get()));
     }
 
     @Override

@@ -38,12 +38,13 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.common.data.AbstractValueProcessor;
 import org.spongepowered.common.data.ImmutableDataCachingUtil;
 import org.spongepowered.common.data.ValueProcessor;
 import org.spongepowered.common.data.value.immutable.ImmutableSpongeValue;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 
-public class DisplayNameVisibleValueProcessor implements ValueProcessor<Boolean, Value<Boolean>> {
+public class DisplayNameVisibleValueProcessor extends AbstractValueProcessor<Boolean> {
 
     @Override
     public Key<? extends BaseValue<Boolean>> getKey() {
@@ -61,32 +62,8 @@ public class DisplayNameVisibleValueProcessor implements ValueProcessor<Boolean,
     }
 
     @Override
-    public Optional<Value<Boolean>> getApiValueFromContainer(ValueContainer<?> container) {
-        final Optional<Boolean> optional = getValueFromContainer(container);
-        if (optional.isPresent()) {
-            return Optional.<Value<Boolean>>of(new SpongeValue<Boolean>(Keys.SHOWS_DISPLAY_NAME, true, optional.get()));
-        }
-        return Optional.absent();
-    }
-
-    @Override
     public boolean supports(ValueContainer<?> container) {
         return container instanceof Entity || container instanceof ItemStack || container instanceof IWorldNameable;
-    }
-
-    @Override
-    public DataTransactionResult transform(ValueContainer<?> container, Function<Boolean, Boolean> function) {
-        final Optional<Boolean> optional = getValueFromContainer(container);
-        if (optional.isPresent()) {
-            final boolean newDisplays = checkNotNull(function.apply(optional.get()));
-            return offerToStore(container, newDisplays);
-        }
-        return DataTransactionBuilder.failNoData();
-    }
-
-    @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
-        return offerToStore(container, ((Boolean) value.get()));
     }
 
     @Override

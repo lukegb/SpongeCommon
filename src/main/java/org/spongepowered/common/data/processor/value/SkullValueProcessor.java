@@ -40,12 +40,13 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.common.data.AbstractValueProcessor;
 import org.spongepowered.common.data.ValueProcessor;
 import org.spongepowered.common.data.processor.common.SkullUtils;
 import org.spongepowered.common.data.type.SpongeSkullType;
 import org.spongepowered.common.data.value.mutable.SpongeValue;
 
-public class SkullValueProcessor implements ValueProcessor<SkullType, Value<SkullType>> {
+public class SkullValueProcessor extends AbstractValueProcessor<SkullType> {
 
     @Override
     public Key<? extends BaseValue<SkullType>> getKey() {
@@ -90,15 +91,14 @@ public class SkullValueProcessor implements ValueProcessor<SkullType, Value<Skul
     }
 
     @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
+    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<SkullType> value) {
         @SuppressWarnings("unchecked")
-        BaseValue<SkullType> realValue = (BaseValue<SkullType>) value;
-        ImmutableValue<SkullType> proposedValue = this.getNewValue(realValue.get()).asImmutable();
+        ImmutableValue<SkullType> proposedValue = this.getNewValue(value.get()).asImmutable();
         ImmutableValue<SkullType> oldValue;
 
         DataTransactionBuilder builder = DataTransactionBuilder.builder();
 
-        int skullType = ((SpongeSkullType) realValue.get()).getByteId();
+        int skullType = ((SpongeSkullType) value.get()).getByteId();
 
         if (container instanceof TileEntitySkull) {
             oldValue = getApiValueFromContainer(container).get().asImmutable();

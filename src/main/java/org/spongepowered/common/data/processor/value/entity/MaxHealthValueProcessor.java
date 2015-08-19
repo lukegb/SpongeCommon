@@ -86,9 +86,8 @@ public class MaxHealthValueProcessor implements ValueProcessor<Double, MutableBo
 
     @SuppressWarnings("unchecked")
     @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
-        final BaseValue<Double> actualValue = (BaseValue<Double>) value;
-        final ImmutableBoundedValue<Double> proposedValue = new ImmutableSpongeBoundedValue<Double>(Keys.MAX_HEALTH, actualValue.get(), 20D,
+    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<Double> value) {
+        final ImmutableBoundedValue<Double> proposedValue = new ImmutableSpongeBoundedValue<Double>(Keys.MAX_HEALTH, value.get(), 20D,
                                                                                                     doubleComparator(), 1D,
                                                                                                     (double) Float.MAX_VALUE);
         if (container instanceof EntityLivingBase) {
@@ -96,7 +95,7 @@ public class MaxHealthValueProcessor implements ValueProcessor<Double, MutableBo
             final ImmutableBoundedValue<Double> oldHealthValue = getApiValueFromContainer(container).get().asImmutable();
 
             try {
-                ((EntityLivingBase) container).getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(actualValue.get());
+                ((EntityLivingBase) container).getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(value.get());
             } catch (Exception e) {
                 return DataTransactionBuilder.errorResult(proposedValue);
             }

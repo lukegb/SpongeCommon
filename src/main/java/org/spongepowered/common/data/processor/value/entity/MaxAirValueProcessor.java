@@ -86,12 +86,8 @@ public class MaxAirValueProcessor implements ValueProcessor<Integer, MutableBoun
     }
 
     @Override
-    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<?> value) {
-        final Object object = value.get();
-        if (object instanceof Number) {
-            return offerToStore(container, ((Number) object).intValue());
-        }
-        return DataTransactionBuilder.failNoData();
+    public DataTransactionResult offerToStore(ValueContainer<?> container, BaseValue<Integer> value) {
+        return offerToStore(container, value.get());
     }
 
     @Override
