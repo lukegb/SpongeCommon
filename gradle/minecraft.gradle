@@ -18,6 +18,7 @@ minecraft {
     }
 
     mappings = 'snapshot_20150301'
+    runDir = 'run'
 }
 
 // Compile options
@@ -42,10 +43,27 @@ setupDecompWorkspace.dependsOn copySrgs
 setupDevWorkspace.dependsOn copySrgs
 compileJava.dependsOn copySrgs
 
+// Add Common access transformer
+sourceSets.main.resources.files.each {
+    if (it.name.endsWith('_at.cfg')) {
+        logger.lifecycle("Found AccessTransformer in main resources: $it.name")
+        minecraft.at it
+    }
+}
+
+deobfMcMCP { failOnAtError = false }
+deobfMcSRG { failOnAtError = false }
+
+plugins.withId('net.minecraftforge.gradle.tweaker-server') {
+    afterEvaluate {
+        reobfJar.primarySrg = minecraftPlugin.delayedFile('{SRG_DIR}/mcp-srg.srg')
+    }
+}
+
 // Configure reobfuscation for mixins
-reobf.doFirst {
+reobfJar.doFirst {
     if (project.mixinSrg.exists()) {
-        addExtraSrgFile project.mixinSrg
+        addSecondarySrgFile project.mixinSrg
     }
 }
 
@@ -69,4 +87,9 @@ checkstyle {
 
 license {
     ext.name = 'Sponge'
+}
+
+// TODO: Remove when https://github.com/MinecraftForge/ForgeGradle/pull/239 is merged
+afterEvaluate {
+    tasks.javadoc.classpath = sourceSets.main.output + sourceSets.main.compileClasspath
 }
