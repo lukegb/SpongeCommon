@@ -35,8 +35,8 @@ import net.minecraft.world.WorldType;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.entity.player.gamemode.GameMode;
-import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
@@ -63,10 +63,10 @@ public class SpongeWorldBuilder implements WorldBuilder {
     private boolean worldEnabled;
     private boolean loadOnStartup;
     private boolean keepSpawnLoaded;
-    private boolean isMod;
-    private int dimensionId; // internal use only
     private DataContainer generatorSettings;
     private ImmutableList<WorldGeneratorModifier> generatorModifiers;
+    private boolean isMod;
+    private int dimensionId; // internal use only
 
     public SpongeWorldBuilder() {
         reset();
@@ -206,12 +206,14 @@ public class SpongeWorldBuilder implements WorldBuilder {
         return this;
     }
 
-    public SpongeWorldBuilder dimensionId(int id) {
+    @Override
+    public WorldBuilder dimensionId(int id) {
         this.dimensionId = id;
         return this;
     }
 
-    public SpongeWorldBuilder isMod(boolean flag) {
+    @Override
+    public WorldBuilder isMod(boolean flag) {
         this.isMod = flag;
         return this;
     }
