@@ -30,7 +30,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenDoublePlant;
-import org.spongepowered.api.data.type.DoubleSizePlantType;
+import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.util.weighted.WeightedCollection;
 import org.spongepowered.api.util.weighted.WeightedObject;
@@ -47,12 +47,12 @@ import java.util.Random;
 @Mixin(WorldGenDoublePlant.class)
 public class MixinWorldGenDoublePlant implements DoublePlant {
 
-    private WeightedCollection<WeightedObject<DoubleSizePlantType>> types;
+    private WeightedCollection<WeightedObject<DoublePlantType>> types;
     private VariableAmount count;
 
     @Inject(method = "<init>()V", at = @At("RETURN"))
     public void onConstructed(CallbackInfo ci) {
-        this.types = new WeightedCollection<WeightedObject<DoubleSizePlantType>>();
+        this.types = new WeightedCollection<WeightedObject<DoublePlantType>>();
         this.count = VariableAmount.fixed(1);
     }
 
@@ -97,7 +97,7 @@ public class MixinWorldGenDoublePlant implements DoublePlant {
     }
 
     @Override
-    public WeightedCollection<WeightedObject<DoubleSizePlantType>> getPossibleTypes() {
+    public WeightedCollection<WeightedObject<DoublePlantType>> getPossibleTypes() {
         return this.types;
     }
 

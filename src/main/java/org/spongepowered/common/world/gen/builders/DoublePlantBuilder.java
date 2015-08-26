@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
 import net.minecraft.world.gen.feature.WorldGenDoublePlant;
-import org.spongepowered.api.data.type.DoubleSizePlantType;
+import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.util.weighted.WeightedObject;
 import org.spongepowered.api.world.gen.populator.DoublePlant;
@@ -40,7 +40,7 @@ import java.util.List;
 
 public class DoublePlantBuilder implements DoublePlant.Builder {
     
-    private List<WeightedObject<DoubleSizePlantType>> types;
+    private List<WeightedObject<DoublePlantType>> types;
     private VariableAmount count;
     
     public DoublePlantBuilder() {
@@ -48,10 +48,10 @@ public class DoublePlantBuilder implements DoublePlant.Builder {
     }
 
     @Override
-    public Builder types(WeightedObject<DoubleSizePlantType>... types) {
+    public Builder types(WeightedObject<DoublePlantType>... types) {
         checkNotNull(types, "types");
         this.types.clear();
-        for (WeightedObject<DoubleSizePlantType> type : types) {
+        for (WeightedObject<DoublePlantType> type : types) {
             if (type != null) {
                 this.types.add(type);
             }
@@ -60,10 +60,10 @@ public class DoublePlantBuilder implements DoublePlant.Builder {
     }
 
     @Override
-    public Builder types(Collection<WeightedObject<DoubleSizePlantType>> types) {
+    public Builder types(Collection<WeightedObject<DoublePlantType>> types) {
         checkNotNull(types, "types");
         this.types.clear();
-        for (WeightedObject<DoubleSizePlantType> type : types) {
+        for (WeightedObject<DoublePlantType> type : types) {
             if (type != null) {
                 this.types.add(type);
             }

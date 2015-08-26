@@ -30,7 +30,6 @@ import com.google.common.collect.Lists;
 import org.spongepowered.api.util.VariableAmount;
 import net.minecraft.init.Items;
 import net.minecraft.util.WeightedRandomChestContent;
-import org.spongepowered.api.data.DataManipulator;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackBuilder;

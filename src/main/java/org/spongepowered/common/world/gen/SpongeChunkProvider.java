@@ -160,7 +160,7 @@ public class SpongeChunkProvider implements WorldGenerator, IChunkProvider {
         // Generate base terrain
         ChunkPrimer chunkprimer = new ChunkPrimer();
         MutableBlockVolume blockBuffer = new ChunkPrimerBuffer(chunkprimer, chunkX, chunkZ);
-        ImmutableBiomeArea biomeBuffer = this.cachedBiomes.getImmutableClone();
+        ImmutableBiomeArea biomeBuffer = this.cachedBiomes.getImmutableBiomeCopy();
         this.baseGenerator.populate((org.spongepowered.api.world.World) this.world, blockBuffer, biomeBuffer);
 
         // Apply the generator populators to complete the blockBuffer
@@ -211,8 +211,6 @@ public class SpongeChunkProvider implements WorldGenerator, IChunkProvider {
 
         BlockPos blockpos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
         BiomeType biome = (BiomeType) this.world.getBiomeGenForCoords(blockpos.add(16, 0, 16));
-
-        IMixinWorld iworld = (IMixinWorld) this.world;
 
         // Calling the events makes the Sponge-added populators fire
         org.spongepowered.api.world.Chunk chunk = (org.spongepowered.api.world.Chunk) this.world.getChunkFromChunkCoords(chunkX, chunkZ);

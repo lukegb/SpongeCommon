@@ -24,10 +24,9 @@
  */
 package org.spongepowered.common.world.gen.builders;
 
-import org.spongepowered.common.interfaces.gen.IWorldGenDungeons;
-
 import net.minecraft.world.gen.feature.WorldGenDungeons;
-import org.spongepowered.api.data.manipulator.MobSpawnerData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.MobSpawnerData;
 import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.util.weighted.WeightedCollection;
 import org.spongepowered.api.util.weighted.WeightedEntity;
@@ -35,6 +34,7 @@ import org.spongepowered.api.util.weighted.WeightedItem;
 import org.spongepowered.api.world.gen.populator.Dungeon;
 import org.spongepowered.api.world.gen.populator.Dungeon.Builder;
 import org.spongepowered.common.Sponge;
+import org.spongepowered.common.interfaces.gen.IWorldGenDungeons;
 
 import java.util.Collection;
 
@@ -63,59 +63,61 @@ public class DungeonBuilder implements Dungeon.Builder {
 
     @Override
     public Builder minimumSpawnDelay(short delay) {
-        this.data.setMinimumSpawnDelay(delay);
+        this.data.set(Keys.SPAWNER_MINIMUM_DELAY, delay);
         return this;
     }
 
     @Override
     public Builder maximumSpawnDelay(short delay) {
-        this.data.setMaximumSpawnDelay(delay);
+        this.data.set(Keys.SPAWNER_MAXIMUM_DELAY, delay);
         return this;
     }
 
     @Override
     public Builder spawnCount(short count) {
-        this.data.setSpawnCount(count);
+        this.data.set(Keys.SPAWNER_SPAWN_COUNT, count);
         return this;
     }
 
     @Override
     public Builder maximumNearbyEntities(short count) {
-        this.data.setMaximumNearbyEntities(count);
+        this.data.set(Keys.SPAWNER_MAXIMUM_NEARBY_ENTITIES, count);
         return this;
     }
 
     @Override
     public Builder requiredPlayerRange(short range) {
-        this.data.setRequiredPlayerRange(range);
+        this.data.set(Keys.SPAWNER_REQURED_PLAYER_RANGE, range);
         return this;
     }
 
     @Override
     public Builder spawnRange(short range) {
-        this.data.setSpawnRange(range);
+        this.data.set(Keys.SPAWNER_SPAWN_RANGE, range);
         return this;
     }
 
     @Override
     public Builder possibleEntities(WeightedEntity... entities) {
-        this.data.getPossibleEntitiesToSpawn().clear();
+        WeightedCollection<WeightedEntity> collection = new WeightedCollection<WeightedEntity>();
         for (WeightedEntity entity : entities) {
             if (entity != null && entity.get() != null) {
-                this.data.getPossibleEntitiesToSpawn().add(entity);
+                collection.add(entity);
             }
         }
+        this.data.set(Keys.SPAWNER_ENTITIES, collection);
         return this;
     }
 
     @Override
     public Builder possibleEntities(Collection<WeightedEntity> entities) {
-        this.data.getPossibleEntitiesToSpawn().clear();
+        WeightedCollection<WeightedEntity> collection = new WeightedCollection<WeightedEntity>();
         for (WeightedEntity entity : entities) {
             if (entity != null && entity.get() != null) {
-                this.data.getPossibleEntitiesToSpawn().add(entity);
+                collection.add(entity);
             }
         }
+        this.data.set(Keys.SPAWNER_ENTITIES, collection);
         return this;
     }
 

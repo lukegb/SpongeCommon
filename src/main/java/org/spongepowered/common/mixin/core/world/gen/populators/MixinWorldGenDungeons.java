@@ -24,8 +24,6 @@
  */
 package org.spongepowered.common.mixin.core.world.gen.populators;
 
-import org.spongepowered.common.interfaces.gen.IWorldGenDungeons;
-
 import com.flowpowered.math.vector.Vector3i;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
@@ -38,7 +36,7 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenDungeons;
 import org.spongepowered.api.block.tileentity.MobSpawner;
-import org.spongepowered.api.data.manipulator.MobSpawnerData;
+import org.spongepowered.api.data.manipulator.mutable.MobSpawnerData;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.VariableAmount;
 import org.spongepowered.api.util.weighted.WeightedCollection;
@@ -51,6 +49,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.common.Sponge;
+import org.spongepowered.common.interfaces.gen.IWorldGenDungeons;
 import org.spongepowered.common.util.weighted.WeightedEnchantmentBook;
 
 import java.util.Collection;
@@ -77,7 +76,7 @@ public abstract class MixinWorldGenDungeons implements Dungeon, IWorldGenDungeon
             VariableAmount quantity =
                     VariableAmount.baseWithRandomAddition(item.theMinimumChanceToGenerateItem, item.theMaximumChanceToGenerateItem
                             - item.theMinimumChanceToGenerateItem + 1);
-            this.items.add(new WeightedItem(stack.getItem(), quantity, item.itemWeight, stack.getManipulators()));
+            this.items.add(new WeightedItem(stack.getItem(), quantity, item.itemWeight, stack.getContainers()));
         }
         this.items.add(new WeightedEnchantmentBook(VariableAmount.fixed(1), 1));
     }
@@ -274,7 +273,7 @@ public abstract class MixinWorldGenDungeons implements Dungeon, IWorldGenDungeon
         int n = Math.min(this.count.getFlooredAmount(rand), inv.getSizeInventory());
         for (int i = 0; i < n;) {
             WeightedItem item = this.items.get(rand);
-            Collection<ItemStack> items = item.getRandomItem(Sponge.getSpongeRegistry().getItemBuilder(), rand, n - i);
+            Collection<ItemStack> items = item.getRandomItem(Sponge.getSpongeRegistry().createItemBuilder(), rand, n - i);
             for (ItemStack stack : items) {
                 inv.setInventorySlotContents(i++, (net.minecraft.item.ItemStack) stack);
             }

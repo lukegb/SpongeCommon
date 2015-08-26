@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.interfaces.gen;
 
-import org.spongepowered.api.data.manipulator.MobSpawnerData;
+import org.spongepowered.api.data.manipulator.mutable.MobSpawnerData;
 
 public interface IWorldGenDungeons {
 
