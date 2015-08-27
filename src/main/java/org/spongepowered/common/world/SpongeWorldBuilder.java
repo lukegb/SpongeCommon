@@ -41,6 +41,7 @@ import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
+import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.api.world.WorldCreationSettings;
@@ -67,6 +68,7 @@ public class SpongeWorldBuilder implements WorldBuilder {
     private ImmutableList<WorldGeneratorModifier> generatorModifiers;
     private boolean isMod;
     private int dimensionId; // internal use only
+    private TeleporterAgent teleporterAgent;
 
     public SpongeWorldBuilder() {
         reset();
@@ -196,6 +198,11 @@ public class SpongeWorldBuilder implements WorldBuilder {
     public WorldBuilder generatorSettings(DataContainer settings) {
         this.generatorSettings = settings;
         return this;
+    }
+
+    @Override
+    public WorldBuilder teleporterAgent(TeleporterAgent agent) {
+        return null;
     }
 
     @Override
